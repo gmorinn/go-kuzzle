@@ -21,15 +21,12 @@ func main() {
 		os.Exit(1)
 	}
 	fmt.Println("Connected!")
-
-	test := KuzzleAPI{
+	api := KuzzleAPI{
 		API: kuzzle,
 	}
-	test.createIndex("test1")
-	test.DeleteIndex("test2")
-	test.DeleteIndex("nyc-open-data")
-	res, _ := test.listIndex()
-	fmt.Println(res)
-	err = test.DeleteManyIndex([]string{"test1"})
+	res, _ := api.listIndex()
+	for _, v := range res {
+		fmt.Println(v)
+	}
 	kuzzle.Disconnect()
 }

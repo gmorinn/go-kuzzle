@@ -20,11 +20,16 @@ build_all:
 
 $(TARGET): build_all
 
+tests:
+	@go test -coverprofile=coverage.out ./
+	@go tool cover -html=coverage.out
+
 clean:
 	rm -f $(TARGET)
+	rm -f coverage.out
 
 fclean: clean
 
 re: fclean all
 
-.PHONY: all re clean fclean
+.PHONY: all re clean fclean tests

@@ -12,29 +12,23 @@ type KuzzleAPI struct {
 
 func (k *KuzzleAPI) createIndex(name string) error {
 	if exist, _ := k.ExistIndex(name); exist {
-		fmt.Printf("Index %s already exists!\n", name)
-		return nil
+		return fmt.Errorf("Index \"%s\" already exists!", name)
 	}
 	if err := k.API.Index.Create(name, nil); err != nil {
-		fmt.Printf("Index %s not created!\n", name)
 		return err
 	}
-	fmt.Printf("Index %s created!\n", name)
 	return nil
-
 }
 
 func (k *KuzzleAPI) DeleteIndex(name string) error {
-	if exist, _ := k.ExistIndex(name); !exist {
-		fmt.Printf("Index %s doesn't exist!\n", name)
+	if exist, _ := k.ExistIndex(name); exist {
+		if err := k.API.Index.Delete(name, nil); err != nil {
+			return err
+		}
 		return nil
+	} else {
+		return fmt.Errorf("Index \"%s\" doesn't exist!", name)
 	}
-	if err := k.API.Index.Delete(name, nil); err != nil {
-		fmt.Printf("Index %s not deleted!\n", name)
-		return err
-	}
-	fmt.Printf("Index %s deleted!\n", name)
-	return nil
 }
 
 func (k *KuzzleAPI) DeleteManyIndex(indexes []string) error {
