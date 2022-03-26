@@ -41,7 +41,8 @@ func TestCreateIndex(t *testing.T) {
 
 func TestDeleteIndex(t *testing.T) {
 	var randomIndex string = utils.RandStringRunes(8)
-	var createNewIndex error = testAPI.createIndex(utils.RandStringRunes(8))
+	var newIndex string = utils.RandStringRunes(8)
+	var createNewIndex error = testAPI.createIndex(newIndex)
 	require.NoError(t, createNewIndex)
 
 	tests := []struct {
@@ -52,17 +53,17 @@ func TestDeleteIndex(t *testing.T) {
 		{
 			name:     "Delete with non-existing index",
 			args:     randomIndex,
-			response: fmt.Errorf("Index \"%s\" doesn't exist!", randomIndex),
+			response: fmt.Errorf("Index with index \"%s\"!", randomIndex),
 		},
 		{
 			name:     "Delete with existing index",
-			args:     "test",
+			args:     newIndex,
 			response: nil,
 		},
 		{
 			name:     "Delete with empty index",
 			args:     "",
-			response: fmt.Errorf("Index \"\" doesn't exist!"),
+			response: fmt.Errorf("Index with index \"\"!"),
 		},
 	}
 	for _, v := range tests {
@@ -74,7 +75,37 @@ func TestDeleteIndex(t *testing.T) {
 }
 
 func TestDeleteManyIndex(t *testing.T) {
-	
+	var tab = []string{utils.RandStringRunes(8), utils.RandStringRunes(8), utils.RandStringRunes(8)}
+	for _, v := range tab {
+		testAPI.createIndex(v)
+	}
+	tests := []struct {
+		name     string
+		args     []string
+		response error
+	}{
+		{
+			name:     "Delete with non-existing indexes",
+			args:     []string{utils.RandStringRunes(8), utils.RandStringRunes(12)},
+			response: nil,
+		},
+		{
+			name:     "Delete with existing indexes",
+			args:     tab,
+			response: nil,
+		},
+		{
+			name:     "Delete no index",
+			args:     []string{},
+			response: fmt.Errorf("Array is empty!"),
+		},
+	}
+	for _, v := range tests {
+		t.Run(v.name, func(t *testing.T) {
+			err := testAPI.DeleteManyIndex(v.args)
+			require.Equal(t, v.response, err)
+		})
+	}
 }
 
 func TestExistIndex(t *testing.T) {
@@ -131,5 +162,44 @@ func TestExistIndex(t *testing.T) {
 }
 
 func TestListIndex(t *testing.T) {
-
+	removeAllIndex(testAPI)
+	tests := []struct {
+		name     string
+		response struct {
+			res []string
+			err error
+		}
+	}{
+		{
+			name: "No indexes",
+			response: struct {
+				res []string
+				err error
+			}{
+				[]string{},
+				nil,
+			},
+		},
+		{
+			name: "indexes",
+			response: struct {
+				res []string
+				err error
+			}{
+				[]string{"azertyuiop", "poiuytreza"},
+				nil,
+			},
+		},
+	}
+	for _, v := range tests {
+		t.Run(v.name, func(t *testing.T) {
+			if v.name == "indexes" {
+				testAPI.createIndex("azertyuiop")
+				testAPI.createIndex("poiuytreza")
+			}
+			res, err := testAPI.listIndex()
+			require.Equal(t, v.response.res, res)
+			require.Equal(t, err, v.response.err)
+		})
+	}
 }

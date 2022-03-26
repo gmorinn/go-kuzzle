@@ -28,5 +28,7 @@ func main() {
 	for _, v := range res {
 		fmt.Println(v)
 	}
+	err = api.CreateCollection(res[0], "azertyuiop")
+	fmt.Println(err)
 	kuzzle.Disconnect()
 }

@@ -21,17 +21,16 @@ func (k *KuzzleAPI) createIndex(name string) error {
 }
 
 func (k *KuzzleAPI) DeleteIndex(name string) error {
-	if exist, _ := k.ExistIndex(name); exist {
-		if err := k.API.Index.Delete(name, nil); err != nil {
-			return err
-		}
-		return nil
-	} else {
-		return fmt.Errorf("Index \"%s\" doesn't exist!", name)
+	if err := k.API.Index.Delete(name, nil); err != nil {
+		return fmt.Errorf("Index with index \"%s\"!", name)
 	}
+	return nil
 }
 
 func (k *KuzzleAPI) DeleteManyIndex(indexes []string) error {
+	if len(indexes) == 0 {
+		return fmt.Errorf("Array is empty!")
+	}
 	_, err := k.API.Index.MDelete(indexes, nil)
 	if err != nil {
 		return err
