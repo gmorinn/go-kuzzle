@@ -2,12 +2,40 @@ package main
 
 import (
 	"fmt"
+	"kuzzletest/utils"
 	"log"
 	"os"
 
 	"github.com/kuzzleio/sdk-go/kuzzle"
 	"github.com/kuzzleio/sdk-go/protocol/websocket"
 )
+
+type TypeCollectionEnum string
+
+const (
+	Keyword  TypeCollectionEnum = "keyword"
+	Text                        = "text"
+	Integer                     = "integer"
+	Float                       = "float"
+	Date                        = "date"
+	GeoPoint                    = "geo_point"
+)
+
+type Type struct {
+	CollectionType TypeCollectionEnum `json:"type"`
+}
+
+type User struct {
+	Username    Type `json:"username"`
+	Birthday    Type `json:"birthday"`
+	Age         Type `json:"age"`
+	Description Type `json:"description"`
+	GPA         Type `json:"gpa"`
+}
+
+type CollectionUser struct {
+	Properties User `json:"properties"`
+}
 
 func main() {
 	// Creates a WebSocket connection.
@@ -24,11 +52,21 @@ func main() {
 	api := KuzzleAPI{
 		API: kuzzle,
 	}
-	res, _ := api.listIndex()
-	for _, v := range res {
-		fmt.Println(v)
+	err = api.createIndex("testindex")
+	fmt.Println("error =>", err)
+	fmt.Println("*************")
+	var userTable CollectionUser = CollectionUser{
+		Properties: User{
+			Username:    Type{Keyword},
+			Birthday:    Type{Date},
+			Age:         Type{Integer},
+			Description: Type{Text},
+			GPA:         Type{Float},
+		},
 	}
-	err = api.CreateCollection(res[0], "azertyuiop")
+	res := utils.GetFormatJSON(userTable)
+	fmt.Println(string(res))
+	err = api.CreateCollection("testindedfddvx", "usedrs", nil)
 	fmt.Println(err)
 	kuzzle.Disconnect()
 }

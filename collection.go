@@ -3,13 +3,26 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"kuzzletest/utils"
 )
 
-func (k *KuzzleAPI) CreateCollection(index, collection string) error {
+func (k *KuzzleAPI) CreateCollection(index string, collection string, data json.RawMessage) error {
+	if index == "" {
+		return utils.EmptyIndex()
+	}
+	if collection == "" {
+		return utils.EmptyCollection()
+	}
+	if utils.IsContainUpper(index) || utils.IsContainUpper(collection) {
+		return fmt.Errorf("Uppercase is not allowed!")
+	}
+	if isIndex, _ := k.ExistIndex(index); !isIndex {
+		fmt.Printf("Index \"%s\" doesn't exist, new Index created with collection...\n", index)
+	}
 	if exist, _ := k.ExistCollection(index, collection); exist {
 		return fmt.Errorf("Index \"%s\" with collection \"%s\" already exists!", index, collection)
 	}
-	if err := k.API.Collection.Create(index, collection, nil, nil); err != nil {
+	if err := k.API.Collection.Create(index, collection, data, nil); err != nil {
 		return err
 	}
 	return nil

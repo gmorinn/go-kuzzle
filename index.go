@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"kuzzletest/utils"
 
 	"github.com/kuzzleio/sdk-go/kuzzle"
 )
@@ -11,6 +12,12 @@ type KuzzleAPI struct {
 }
 
 func (k *KuzzleAPI) createIndex(name string) error {
+	if name == "" {
+		return utils.EmptyIndex()
+	}
+	if utils.IsContainUpper(name) {
+		return fmt.Errorf("Uppercase is not allowed! \"%s\"", name)
+	}
 	if exist, _ := k.ExistIndex(name); exist {
 		return fmt.Errorf("Index \"%s\" already exists!", name)
 	}
@@ -21,8 +28,11 @@ func (k *KuzzleAPI) createIndex(name string) error {
 }
 
 func (k *KuzzleAPI) DeleteIndex(name string) error {
+	if name == "" {
+		return utils.EmptyIndex()
+	}
 	if err := k.API.Index.Delete(name, nil); err != nil {
-		return fmt.Errorf("Index with index \"%s\"!", name)
+		return fmt.Errorf("Error with index \"%s\"!", name)
 	}
 	return nil
 }
@@ -39,6 +49,9 @@ func (k *KuzzleAPI) DeleteManyIndex(indexes []string) error {
 }
 
 func (k *KuzzleAPI) ExistIndex(name string) (bool, error) {
+	if name == "" {
+		return false, utils.EmptyIndex()
+	}
 	exist, err := k.API.Index.Exists(name, nil)
 	if err != nil {
 		return false, err

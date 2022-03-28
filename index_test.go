@@ -5,7 +5,6 @@ import (
 	"kuzzletest/utils"
 	"testing"
 
-	"github.com/kuzzleio/sdk-go/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,7 +27,12 @@ func TestCreateIndex(t *testing.T) {
 		{
 			name:     "Create with empty index",
 			args:     "",
-			response: types.KuzzleError(types.KuzzleError{Message: "Index.Create: index required", Stack: "", Status: 400}),
+			response: fmt.Errorf("Index is empty!"),
+		},
+		{
+			name:     "Create index with Uppercase",
+			args:     "AZERTYUIO",
+			response: fmt.Errorf("Uppercase is not allowed! \"AZERTYUIO\""),
 		},
 	}
 	for _, v := range tests {
@@ -53,7 +57,7 @@ func TestDeleteIndex(t *testing.T) {
 		{
 			name:     "Delete with non-existing index",
 			args:     randomIndex,
-			response: fmt.Errorf("Index with index \"%s\"!", randomIndex),
+			response: fmt.Errorf("Error with index \"%s\"!", randomIndex),
 		},
 		{
 			name:     "Delete with existing index",
@@ -63,7 +67,7 @@ func TestDeleteIndex(t *testing.T) {
 		{
 			name:     "Delete with empty index",
 			args:     "",
-			response: fmt.Errorf("Index with index \"\"!"),
+			response: fmt.Errorf("Index is empty!"),
 		},
 	}
 	for _, v := range tests {
@@ -148,7 +152,7 @@ func TestExistIndex(t *testing.T) {
 				error
 			}{
 				false,
-				types.KuzzleError(types.KuzzleError{Message: "Index.Exists: index required", Stack: "", Status: 400}),
+				fmt.Errorf("Index is empty!"),
 			},
 		},
 	}
@@ -186,7 +190,7 @@ func TestListIndex(t *testing.T) {
 				res []string
 				err error
 			}{
-				[]string{"azertyuiop", "poiuytreza"},
+				[]string{utils.RandStringRunes(8), utils.RandStringRunes(10)},
 				nil,
 			},
 		},
@@ -194,11 +198,11 @@ func TestListIndex(t *testing.T) {
 	for _, v := range tests {
 		t.Run(v.name, func(t *testing.T) {
 			if v.name == "indexes" {
-				testAPI.createIndex("azertyuiop")
-				testAPI.createIndex("poiuytreza")
+				testAPI.createIndex(utils.RandStringRunes(8))
+				testAPI.createIndex(utils.RandStringRunes(10))
 			}
 			res, err := testAPI.listIndex()
-			require.Equal(t, v.response.res, res)
+			require.GreaterOrEqual(t, len(res), len(v.response.res))
 			require.Equal(t, err, v.response.err)
 		})
 	}

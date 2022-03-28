@@ -9,9 +9,11 @@ CC = go build
 
 TARGET = gm
 
-SRC_COMPONENTS = main.go \
+SRC =	main.go \
+		index.go \
+		collection.go \
+		utils/utils.go
 
-SRC =	$(SRC_COMPONENTS) \
 
 all: $(TARGET)
 
