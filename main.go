@@ -89,5 +89,13 @@ func main() {
 	res, err = api.CreateDocument("test", "users", id, payload)
 	fmt.Println(string(res))
 	fmt.Println(err)
+	res, err = api.CreateDocument("test", "users", id, payload)
+	fmt.Println(err)
+	result, err := api.DeleteDocument("tesRTRERt", "users_FG", id)
+	fmt.Println("result => ", result)
+	fmt.Println("err => ", err)
+	result, err = api.DeleteDocument("test", "users", id)
+	fmt.Println("result => ", result)
+	fmt.Println("err => ", err)
 	kuzzle.Disconnect()
 }
