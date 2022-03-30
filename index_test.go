@@ -32,7 +32,7 @@ func TestCreateIndex(t *testing.T) {
 		{
 			name:     "Create index with Uppercase",
 			args:     "AZERTYUIO",
-			response: fmt.Errorf("Uppercase is not allowed! \"AZERTYUIO\""),
+			response: fmt.Errorf("Uppercase is not allowed!"),
 		},
 	}
 	for _, v := range tests {

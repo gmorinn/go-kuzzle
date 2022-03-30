@@ -6,15 +6,12 @@ import (
 	"kuzzletest/utils"
 )
 
-func (k *KuzzleAPI) CreateCollection(index string, collection string, data json.RawMessage) error {
-	if index == "" {
-		return utils.EmptyIndex()
+func (k *KuzzleAPI) CreateCollection(index, collection string, data json.RawMessage) error {
+	if err := utils.CheckErrorIndex(index); err != nil {
+		return err
 	}
-	if collection == "" {
-		return utils.EmptyCollection()
-	}
-	if utils.IsContainUpper(index) || utils.IsContainUpper(collection) {
-		return fmt.Errorf("Uppercase is not allowed!")
+	if err := utils.CheckErrorCollection(collection); err != nil {
+		return err
 	}
 	if isIndex, _ := k.ExistIndex(index); !isIndex {
 		fmt.Printf("Index \"%s\" doesn't exist, new Index created with collection...\n", index)

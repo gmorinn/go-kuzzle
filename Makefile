@@ -12,6 +12,7 @@ TARGET = gm
 SRC =	main.go \
 		index.go \
 		collection.go \
+		document.go \
 		utils/utils.go
 
 

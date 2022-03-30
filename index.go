@@ -12,11 +12,8 @@ type KuzzleAPI struct {
 }
 
 func (k *KuzzleAPI) createIndex(name string) error {
-	if name == "" {
-		return utils.EmptyIndex()
-	}
-	if utils.IsContainUpper(name) {
-		return fmt.Errorf("Uppercase is not allowed! \"%s\"", name)
+	if err := utils.CheckErrorIndex(name); err != nil {
+		return err
 	}
 	if exist, _ := k.ExistIndex(name); exist {
 		return fmt.Errorf("Index \"%s\" already exists!", name)
@@ -28,8 +25,8 @@ func (k *KuzzleAPI) createIndex(name string) error {
 }
 
 func (k *KuzzleAPI) DeleteIndex(name string) error {
-	if name == "" {
-		return utils.EmptyIndex()
+	if err := utils.CheckErrorIndex(name); err != nil {
+		return err
 	}
 	if err := k.API.Index.Delete(name, nil); err != nil {
 		return fmt.Errorf("Error with index \"%s\"!", name)
@@ -49,8 +46,8 @@ func (k *KuzzleAPI) DeleteManyIndex(indexes []string) error {
 }
 
 func (k *KuzzleAPI) ExistIndex(name string) (bool, error) {
-	if name == "" {
-		return false, utils.EmptyIndex()
+	if err := utils.CheckErrorIndex(name); err != nil {
+		return false, err
 	}
 	exist, err := k.API.Index.Exists(name, nil)
 	if err != nil {

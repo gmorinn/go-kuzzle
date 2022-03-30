@@ -5,7 +5,9 @@ import (
 	"kuzzletest/utils"
 	"log"
 	"os"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/kuzzleio/sdk-go/kuzzle"
 	"github.com/kuzzleio/sdk-go/protocol/websocket"
 )
@@ -33,6 +35,14 @@ type User struct {
 	GPA         Type `json:"gpa"`
 }
 
+type PayloadUser struct {
+	Username    string    `json:"username"`
+	Birthday    time.Time `json:"birthday"`
+	Age         int64     `json:"age"`
+	Description string    `json:"description"`
+	GPA         float64   `json:"gpa"`
+}
+
 type CollectionUser struct {
 	Properties User `json:"properties"`
 }
@@ -52,9 +62,7 @@ func main() {
 	api := KuzzleAPI{
 		API: kuzzle,
 	}
-	err = api.createIndex("testindex")
-	fmt.Println("error =>", err)
-	fmt.Println("*************")
+	err = api.createIndex("test")
 	var userTable CollectionUser = CollectionUser{
 		Properties: User{
 			Username:    Type{Keyword},
@@ -66,7 +74,20 @@ func main() {
 	}
 	res := utils.GetFormatJSON(userTable)
 	fmt.Println(string(res))
-	err = api.CreateCollection("testindedfddvx", "usedrs", nil)
+	err = api.DeleteCollection("test", "users")
+	fmt.Println(err)
+	err = api.CreateCollection("test", "users", res)
+
+	payload := PayloadUser{
+		Username:    "guillaume",
+		Birthday:    time.Now(),
+		Age:         19,
+		Description: "AZERTYUIOP POIUYTREZA",
+		GPA:         2.5,
+	}
+	id := uuid.New().String()
+	res, err = api.CreateDocument("test", "users", id, payload)
+	fmt.Println(string(res))
 	fmt.Println(err)
 	kuzzle.Disconnect()
 }
